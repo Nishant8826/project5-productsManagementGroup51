@@ -122,15 +122,18 @@ const updateCart=async(req,res)=>{
         if (!findProduct)return res.status(404).send({ status: false, message: "No product found with respect to this productId" })
 
         //removeProduct validation
-        if (!removeProduct) {return res.status(400).send({ status: false, message:"removeProduct is required" })
+        if (!validator.isValid(removeProduct)) {return res.status(400).send({ status: false, message:"removeProduct is required" })
         }else {
             if (removeProduct == 0) {
                 for (let i = 0; i < findCart.items.length; i++) {
                     if (findCart.items[i].productId == productId) {
 
                         let quantityCalculate = findCart.items[i].quantity
+                        // console.log(quantityCalculate)
                         let checkPrice = findProduct.price
+                        // console.log(checkPrice)
                         let totalPrice = findCart.totalPrice - (checkPrice * quantityCalculate)
+                        // console.log(totalPrice)
 
                         findCart.items.splice(i, 1)
 

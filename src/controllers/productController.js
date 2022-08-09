@@ -101,7 +101,8 @@ const getProduct = async function (req, res) {
         //else filtered with new object containing isDeleted:false && queryData
         let objectFilter = { isDeleted: false }
 
-        let {size,name,priceGreaterThan,priceLessThan,sortedBy,...rest}=queryData
+        let {size,name,priceGreaterThan,priceLessThan,priceSort ,...rest}=queryData
+        
         if(Object.keys(rest).length > 0)return res.status(400).send({ status: false, message: `${Object.keys(rest)} => Invalid Attribute` })
 
         if (size || size==="") {
@@ -126,7 +127,6 @@ const getProduct = async function (req, res) {
             objectFilter.title.$regex = name
             objectFilter.title.$options = "i"
         }
-        let priceArray = []
         if (priceGreaterThan || priceGreaterThan==="") {
             if (!validator.isValid(priceGreaterThan))return res.status(400).send({ status: false, message: "priceGreaterThan is empty" })
             if (priceRegex.test(priceGreaterThan) == false)return res.status(400).send({ status: false, message: "You entered invalid priceGreaterThan" })
@@ -136,9 +136,9 @@ const getProduct = async function (req, res) {
         if (priceLessThan || priceLessThan==="") {
             if (!validator.isValid(priceLessThan))return res.status(400).send({ status: false, message: "priceLessThan is empty" })
             if (priceRegex.test(priceLessThan) == false)return res.status(400).send({ status: false, message: "You entered invalid priceLessThan" })
-
+            
             let objectKeys = Object.keys(objectFilter)
-
+            
             if (objectKeys.includes("price")) {
                 objectFilter.price.$lt = Number(priceLessThan)
             }else {
@@ -146,11 +146,14 @@ const getProduct = async function (req, res) {
                 objectFilter.price.$lt = Number(priceLessThan)
             }
         }
-        if (sortedBy || sortedBy==="") {
-            if (!validator.isValid(sortedBy))return res.status(400).send({ status: false, message: "sortedBy is empty" })
-            if (!(sortedBy == "1" || sortedBy == "-1"))return res.status(400).send({ status: false, message: "You entered an invalid input sorted By can take only two Inputs 1 OR -1" })
+        if (priceSort  || priceSort ==="") {
+            if (!validator.isValid(priceSort ))return res.status(400).send({ status: false, message: "sortedBy is empty" })
+            if (!(priceSort  == "1" || priceSort  == "-1"))return res.status(400).send({ status: false, message: "You entered an invalid input sorted By can take only two Inputs 1 OR -1" })
         }
-        let findFilter = await productModel.find(objectFilter).sort({ price: sortedBy })
+        
+        // console.log(objectFilter)
+
+        let findFilter = await productModel.find(objectFilter).sort({ price: priceSort  })
         if (findFilter.length == 0)return res.status(404).send({ status: false, message: "No product Found" })
 
         return res.status(200).send({ status: true, message: `${findFilter.length} Matched Found`, data: findFilter })

@@ -63,7 +63,7 @@ const updateOrder = async (req, res) => {
         //authorization
         if (userId != req.tokenData.userId) return res.status(401).send({ status: false, Message: "Unauthorized user!" })
 
-        let findCart = await cartModel.findOne({ userId: userId })
+        let findCart = await cartModel.findOne({ userId })
         if (!findCart)
             return res.status(404).send({ status: false, message: "No cart found....." })
 
